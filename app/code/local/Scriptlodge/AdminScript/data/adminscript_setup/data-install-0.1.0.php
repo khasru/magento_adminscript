@@ -145,4 +145,68 @@ $category->setIsAnchor(1); // set category "Is Anchor" yes
 $category->save();
 
 
+/* === Update All Category and Run Indexing ==== */
+
+$storeIds = Mage::getModel('core/store')->getCollection()->getAllIds();
+$category = Mage::getModel('catalog/category');
+$tree = $category->getTreeModel();
+$tree->load();
+$ids = $tree->getCollection()->getAllIds();
+asort($ids);
+$categories = array();
+$storeId = 0;
+$resource = Mage::getResourceModel('catalog/category');
+if ($ids) {
+    foreach ($ids as $id) {
+        $cat = $category->load($id);
+        if ($cat->getId() && $cat->getLevel() > 1) {
+            $cat->setData('is_anchor', 1);
+            //$cat->save();
+            $resource->saveAttribute($cat, 'is_anchor');
+            unset($cat);
+        }
+    }
+}
+
+$process = Mage::getSingleton('index/indexer')->getProcessByCode('catalog_category_flat');
+$process->reindexEverything();
+
+
+/* === Email Template Upgrade ==== */
+
+$template_code = "Email - Header";
+$templateText = <<<EOT
+Template Content here
+EOT;
+
+$emailTemplate = Mage::getModel('core/email_template');
+$emailTemplate->loadByCode($template_code);
+if ($emailTemplate->getTemplateId()) {
+    $emailTemplate->setTemplateText($templateText);
+    $emailTemplate->save();
+}
+
+/* === Product Upgrade ==== */
+
+Mage::app()->getStore()->setId(0);
+$descriptions = <<<EOT
+<p>Product description here</p>
+EOT;
+
+$product_id = 344;
+$product = Mage::getModel('catalog/product')->load($product_id);
+$product->setDescription($descriptions);
+$product->save();
+
+
+
+/* === Drop table ==== */
+
+$command = "
+DROP TABLE IF EXISTS `custome_table`;
+";
+$installer->run($command);
+
+
+
 $installer->endSetup();
