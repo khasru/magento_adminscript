@@ -1,4 +1,6 @@
 <?php
+// https://github.com/khasru/magento_adminscript.git   
+
 $installer = $this;
 $installer->startSetup();
 
