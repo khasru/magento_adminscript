@@ -167,7 +167,6 @@ if ($ids) {
         }
     }
 }
-
 $process = Mage::getSingleton('index/indexer')->getProcessByCode('catalog_category_flat');
 $process->reindexEverything();
 
