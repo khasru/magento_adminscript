@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Scriptlodge_AdminScript>
+            <active>true</active>
+            <codePool>local</codePool>            
+        </Scriptlodge_AdminScript>
+    </modules>
+</config>
